@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="light_blue">#E3F2FD</color>
+    <color name="dark_blue">#0D47A1</color>
+    <color name="primary">#1565C0</color>
+
+    <!-- Colores de los botones -->
+    <color name="boton_inicio">#3BAFDA</color> <!-- Color del botón de Iniciar -->
+    <color name="boton_final">#2C9EAD</color> <!-- Color del botón de Finalizar -->
+    <color name="texto_boton">#FFFFFF</color> <!-- Color del texto del botón -->
+
+</resources>
