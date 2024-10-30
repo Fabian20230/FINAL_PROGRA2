@@ -1,4 +1,3 @@
-// EndActivity.java
 package gt.edu.umg.final_progra2;
 
 import android.annotation.SuppressLint;
@@ -29,6 +28,7 @@ public class EndActivity extends AppCompatActivity {
     private String endTime;
     private DbDatos dbDatos;
     private SharedPreferences preferences;
+    private Bitmap endPhoto;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,18 +73,17 @@ public class EndActivity extends AppCompatActivity {
         if (requestCode == 1 && resultCode == RESULT_OK && data != null) {
             Bundle extras = data.getExtras();
             if (extras != null) {
-                Bitmap photo = (Bitmap) extras.get("data");
-                if (photo != null) {
-                    ivEndPhoto.setImageBitmap(photo);
+                endPhoto = (Bitmap) extras.get("data");
+                if (endPhoto != null) {
+                    ivEndPhoto.setImageBitmap(endPhoto);
 
                     long lastInsertId = dbDatos.getLastInsertId();
                     if (lastInsertId != -1) {
-                        dbDatos.updateEndData(lastInsertId, endLatitude, endLongitude, endTime);
+                        dbDatos.updateEndData(lastInsertId, endLatitude, endLongitude, dbDatos.getBitmapAsByteArray(endPhoto), endTime);
                         Toast.makeText(this, "Actividad finalizada", Toast.LENGTH_SHORT).show();
 
                         preferences.edit().putBoolean("activityInProgress", false).apply();
 
-                        // Navegar a MainActivity y finalizar EndActivity
                         Intent intent = new Intent(EndActivity.this, MainActivity.class);
                         startActivity(intent);
                         finish();

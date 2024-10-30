@@ -1,4 +1,3 @@
-// StartActivity.java
 package gt.edu.umg.final_progra2;
 
 import android.Manifest;
@@ -10,6 +9,7 @@ import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -29,10 +29,12 @@ public class StartActivity extends AppCompatActivity {
     private FusedLocationProviderClient fusedLocationClient;
     private TextView tvLocation;
     private ImageView ivStartPhoto;
+    private EditText etActivityDescription;
     private double startLatitude, startLongitude;
     private String startTime;
     private DbDatos dbDatos;
     private SharedPreferences preferences;
+    private Bitmap startPhoto;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,6 +43,7 @@ public class StartActivity extends AppCompatActivity {
 
         tvLocation = findViewById(R.id.tvLocation);
         ivStartPhoto = findViewById(R.id.ivStartPhoto);
+        etActivityDescription = findViewById(R.id.etActivityDescription);
         Button btnStart = findViewById(R.id.btnStart);
         dbDatos = new DbDatos(this);
         preferences = getSharedPreferences("ActivityTrackerPrefs", MODE_PRIVATE);
@@ -55,9 +58,7 @@ public class StartActivity extends AppCompatActivity {
             return;
         }
 
-        btnStart.setOnClickListener(v -> {
-            captureStartLocationAndPhoto();
-        });
+        btnStart.setOnClickListener(v -> captureStartLocationAndPhoto());
     }
 
     private void checkPermissions() {
@@ -97,14 +98,16 @@ public class StartActivity extends AppCompatActivity {
         if (requestCode == 1 && resultCode == RESULT_OK && data != null) {
             Bundle extras = data.getExtras();
             if (extras != null) {
-                Bitmap photo = (Bitmap) extras.get("data");
-                if (photo != null) {
-                    ivStartPhoto.setImageBitmap(photo);
-                    dbDatos.insertaDatos("Actividad", startLatitude, startLongitude, 0, 0, startTime, "");
+                startPhoto = (Bitmap) extras.get("data");
+                if (startPhoto != null) {
+                    ivStartPhoto.setImageBitmap(startPhoto);
+
+                    String activityDescription = etActivityDescription.getText().toString();
+
+                    dbDatos.insertaDatos(activityDescription, startLatitude, startLongitude, dbDatos.getBitmapAsByteArray(startPhoto), 0, 0, null, startTime, "");
 
                     preferences.edit().putBoolean("activityInProgress", true).apply();
 
-                    // Navegar a MainActivity y finalizar StartActivity
                     Intent intent = new Intent(StartActivity.this, MainActivity.class);
                     startActivity(intent);
                     finish();

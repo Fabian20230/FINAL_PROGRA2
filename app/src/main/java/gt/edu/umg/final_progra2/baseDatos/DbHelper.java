@@ -1,6 +1,5 @@
 package gt.edu.umg.final_progra2.baseDatos;
 
-
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
@@ -8,7 +7,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import androidx.annotation.Nullable;
 
 public class DbHelper extends SQLiteOpenHelper {
-    private static final int DB_VERSION = 1;
+    private static final int DB_VERSION = 2; // Aumenta la versión de la base de datos
     private static final String DB_NOMBRE = "activity_tracker.db";
     public static final String TABLE_ACTIVITIES = "tb_activities";
 
@@ -26,7 +25,9 @@ public class DbHelper extends SQLiteOpenHelper {
                 "fin_latitud REAL, " +
                 "fin_longitud REAL, " +
                 "hora_inicio TEXT, " +
-                "hora_fin TEXT)");
+                "hora_fin TEXT, " +
+                "inicio_imagen BLOB, " +
+                "fin_imagen BLOB)");
     }
 
     @Override

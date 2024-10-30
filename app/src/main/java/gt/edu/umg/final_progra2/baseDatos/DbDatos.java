@@ -5,6 +5,8 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import androidx.annotation.Nullable;
+import java.io.ByteArrayOutputStream;
+import android.graphics.Bitmap;
 
 public class DbDatos extends DbHelper {
 
@@ -12,26 +14,36 @@ public class DbDatos extends DbHelper {
         super(context);
     }
 
-    // Método para insertar una nueva actividad al aire libre
-    public long insertaDatos(String actividad, double inicioLatitud, double inicioLongitud, double finLatitud, double finLongitud, String horaInicio, String horaFin) {
+    // Método para convertir Bitmap a byte[]
+    public byte[] getBitmapAsByteArray(Bitmap bitmap) {
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream);
+        return outputStream.toByteArray();
+    }
+
+    // Método para insertar una nueva actividad con imagen y descripción
+    public long insertaDatos(String actividad, double inicioLatitud, double inicioLongitud, byte[] inicioImagen, double finLatitud, double finLongitud, byte[] finImagen, String horaInicio, String horaFin) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put("actividad", actividad);
         values.put("inicio_latitud", inicioLatitud);
         values.put("inicio_longitud", inicioLongitud);
+        values.put("inicio_imagen", inicioImagen);
         values.put("fin_latitud", finLatitud);
         values.put("fin_longitud", finLongitud);
+        values.put("fin_imagen", finImagen);
         values.put("hora_inicio", horaInicio);
         values.put("hora_fin", horaFin);
         return db.insert(TABLE_ACTIVITIES, null, values);
     }
 
     // Método para actualizar el registro de fin de una actividad existente
-    public boolean updateEndData(long id, double finLatitud, double finLongitud, String horaFin) {
+    public boolean updateEndData(long id, double finLatitud, double finLongitud, byte[] finImagen, String horaFin) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put("fin_latitud", finLatitud);
         values.put("fin_longitud", finLongitud);
+        values.put("fin_imagen", finImagen);
         values.put("hora_fin", horaFin);
 
         int rowsAffected = db.update(TABLE_ACTIVITIES, values, "id = ?", new String[]{String.valueOf(id)});
@@ -54,5 +66,41 @@ public class DbDatos extends DbHelper {
     public Cursor getAllData() {
         SQLiteDatabase db = this.getReadableDatabase();
         return db.rawQuery("SELECT * FROM " + TABLE_ACTIVITIES + " ORDER BY hora_inicio ASC", null);
+    }
+
+    // Método para obtener la imagen de inicio de una actividad
+    public byte[] getStartImage(long id) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT inicio_imagen FROM " + TABLE_ACTIVITIES + " WHERE id = ?", new String[]{String.valueOf(id)});
+        if (cursor != null && cursor.moveToFirst()) {
+            byte[] imagen = cursor.getBlob(0);
+            cursor.close();
+            return imagen;
+        }
+        return null;
+    }
+
+    // Método para obtener la imagen de fin de una actividad
+    public byte[] getEndImage(long id) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT fin_imagen FROM " + TABLE_ACTIVITIES + " WHERE id = ?", new String[]{String.valueOf(id)});
+        if (cursor != null && cursor.moveToFirst()) {
+            byte[] imagen = cursor.getBlob(0);
+            cursor.close();
+            return imagen;
+        }
+        return null;
+    }
+
+    // Método para obtener la descripción de una actividad
+    public String getActivityDescription(long id) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT actividad FROM " + TABLE_ACTIVITIES + " WHERE id = ?", new String[]{String.valueOf(id)});
+        if (cursor != null && cursor.moveToFirst()) {
+            String descripcion = cursor.getString(0);
+            cursor.close();
+            return descripcion;
+        }
+        return null;
     }
 }
